@@ -42,9 +42,9 @@ webhooks:
         name: sap-btp-operator-webhook-service
         namespace: {{.Release.Namespace}}
         path: /mutate-services-cloud-sap-com-v1-servicebinding
-        {{- if not .Values.manager.certificates }}
-          caBundle: {{ b64enc $ca.Cert }}
-        {{- end }}
+      {{- if not .Values.manager.certificates }}
+        caBundle: {{ b64enc $ca.Cert }}
+      {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
       {{- end }}
@@ -72,9 +72,9 @@ webhooks:
         name: sap-btp-operator-webhook-service
         namespace: {{.Release.Namespace}}
         path: /mutate-services-cloud-sap-com-v1-serviceinstance
-        {{- if not .Values.manager.certificates }}
-          caBundle: {{ b64enc $ca.Cert }}
-        {{- end }}
+      {{- if not .Values.manager.certificates }}
+        caBundle: {{ b64enc $ca.Cert }}
+      {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
       {{- end }}
@@ -112,9 +112,9 @@ webhooks:
         name: sap-btp-operator-webhook-service
         namespace: {{.Release.Namespace}}
         path: /validate-services-cloud-sap-com-v1-servicebinding
-        {{- if not .Values.manager.certificates }}
-          caBundle: {{ b64enc $ca.Cert }}
-        {{- end }}
+      {{- if not .Values.manager.certificates }}
+        caBundle: {{ b64enc $ca.Cert }}
+      {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
       {{- end }}
