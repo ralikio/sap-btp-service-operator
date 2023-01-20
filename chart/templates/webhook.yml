@@ -43,7 +43,7 @@ webhooks:
         namespace: {{.Release.Namespace}}
         path: /mutate-services-cloud-sap-com-v1-servicebinding
       {{- if not .Values.manager.certificates }}
-        caBundle: {{ b64enc $ca.Cert }}
+      caBundle: {{ b64enc $ca.Cert }}
       {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
@@ -73,7 +73,7 @@ webhooks:
         namespace: {{.Release.Namespace}}
         path: /mutate-services-cloud-sap-com-v1-serviceinstance
       {{- if not .Values.manager.certificates }}
-        caBundle: {{ b64enc $ca.Cert }}
+      caBundle: {{ b64enc $ca.Cert }}
       {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
@@ -113,7 +113,7 @@ webhooks:
         namespace: {{.Release.Namespace}}
         path: /validate-services-cloud-sap-com-v1-servicebinding
       {{- if not .Values.manager.certificates }}
-        caBundle: {{ b64enc $ca.Cert }}
+      caBundle: {{ b64enc $ca.Cert }}
       {{- end }}
       {{- if .Values.manager.certificates.selfSigned }}
       caBundle: {{.Values.manager.certificates.selfSigned.caBundle }}
