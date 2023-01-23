@@ -6,7 +6,7 @@ manager:
   memory_limit: 200Mi
   cpu_limit: 250m
   req_memory_limit: 20Mi
-  req_cpu_limit: 100m
+  req_cpu_limit: 10m
   allow_cluster_access: true
   allowed_namespaces: []
   replica_count: 2
@@ -40,7 +40,7 @@ manager:
 #   - name: registrySecretName
   certificates:
     # Configure if https://github.com/jetstack/cert-manager is used
-    certManager: true
+    certManager: false
     # Configure if self-generated, self-signed certificates are used
     # selfSigned: {}
     # selfSigned:
@@ -73,6 +73,6 @@ manager:
   health_service:
     enabled: false
   kubernetesMatchLabels:
-    enabled: false
+    enabled: true
 cluster:
   id:
