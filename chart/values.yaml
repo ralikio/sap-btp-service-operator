@@ -3,14 +3,16 @@
 # Declare variables to be passed into your templates.
 
 manager:
+  annotations:
+    sidecar.istio.io/inject: "false" 
   memory_limit: 200Mi
   cpu_limit: 250m
   req_memory_limit: 20Mi
   req_cpu_limit: 10m
   allow_cluster_access: true
   allowed_namespaces: []
-  replica_count: 2
-  enable_leader_election: true
+  replica_count: 1
+  enable_leader_election: false
   management_namespace:
   image:
     repository: ghcr.io/sap/sap-btp-service-operator/controller
