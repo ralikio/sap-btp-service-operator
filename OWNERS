@@ -12,10 +12,10 @@ filters:
       - area/service-management
   '\.md$|/docs/|^milv\.config\.yaml$':
     approvers:
-      - klaudiagrz
       - mmitoraj
-      - majakurcius
       - NHingerl
       - grego952
+      - IwonaLanger
+      - nataliasitko
     labels:
       - area/documentation
