@@ -63,11 +63,6 @@ helm template sap-btp-operator . \
     --set cluster.id="<fill in>"
 
 # Changes between the chart and the original one
-### Istio disabled
-Add annotation to the deployment:
-```
-sidecar.istio.io/inject: "false"
-```
 
 ### Move secrets into webhook.yml and define certificates:
 ```yaml
@@ -98,6 +93,18 @@ data:
   tls.key: {{ b64enc $cert.Key }}
 ---
 {{- end}}
+{{- if .Values.manager.certificates.selfSigned }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-server-cert
+  namespace: {{.Release.Namespace}}
+type: kubernetes.io/tls
+data:
+  tls.crt: "{{ .Values.manager.certificates.selfSigned.crt }}"
+  tls.key: "{{ .Values.manager.certificates.selfSigned.key }}"
+---
+{{- end}}
 ```
 Add `caBundle` definition in both webhooks:
 ```
@@ -106,12 +113,19 @@ caBundle: {{ b64enc $ca.Cert }}
 {{- end }}
 ```
 
-### Add sap-btp-operator labels
+### Overrides
 
-The deployment and service must contain btp operator specific labels (deployment spec, deployment template and the service label selector):
 ```yaml
-app.kubernetes.io/instance: sap-btp-operator
-app.kubernetes.io/name: sap-btp-operator
+manager:
+  annotations:
+    sidecar.istio.io/inject: "false"
+  req_cpu_limit: 10m
+  replica_count: 1
+  enable_leader_election: false
+  certificates:
+    certManager: false
+  kubernetesMatchLabels:
+    enabled: true
 ```
 
 # How to publish a new version of a chart
