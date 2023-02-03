@@ -1,8 +1,10 @@
 # sap-btp-operator Helm Chart
 
-This is a custom version of the sap-btp-operator helm chart.
+## Overview  
 
-The upstream version of the sap-btp-operator helm chart has a dependency on the jetstack cert-manager. This custom version makes [jetstack/cert-manager](https://github.com/jetstack/cert-manager) optional and adds the possibility to use a custom caBundle or [gardener/cert-management](https://github.com/gardener/cert-management).
+This is a custom version of the sap-btp-operator Helm chart.
+
+The upstream version of the sap-btp-operator Helm chart has a dependency on the Jetstack cert-manager. This custom version makes [jetstack/cert-manager](https://github.com/jetstack/cert-manager) optional and adds the possibility to use a custom caBundle or [gardener/cert-management](https://github.com/gardener/cert-management).
 
 ## Prerequeisites
 
@@ -11,7 +13,9 @@ The upstream version of the sap-btp-operator helm chart has a dependency on the 
 
 ## Install Chart
 
-### With fixed caBundle:
+<details>
+<summary>With fixed caBundle</summary>
+
 helm install sap-btp-operator . \
     --atomic \
     --create-namespace \
@@ -22,7 +26,11 @@ helm install sap-btp-operator . \
     --set manager.secret.tokenurl="<fill in>" \
     --set cluster.id="<fill in>"
 
-### With custom caBundle:
+ </details>
+
+<details>
+<summary>With custom caBundle</summary>
+
 helm install sap-btp-operator . \
     --atomic \
     --create-namespace \
@@ -36,7 +44,11 @@ helm install sap-btp-operator . \
     --set manager.certificates.selfSigned.key="${SERVERKEY}" \
     --set cluster.id="<fill in>"
 
-### With jetstack/cert-manager
+ </details>
+
+<details>
+<summary>With jetstack/cert-manager</summary>
+
 helm install sap-btp-operator . \
     --atomic \
     --create-namespace \
@@ -48,7 +60,11 @@ helm install sap-btp-operator . \
     --set manager.certificates.certManager=true \
     --set cluster.id="<fill in>"
 
-### With gardener/cert-management
+  </details>
+
+<details>
+<summary>With gardener/cert-management</summary>
+
 helm template sap-btp-operator . \
     --atomic \
     --create-namespace \
@@ -62,9 +78,11 @@ helm template sap-btp-operator . \
     --set manager.certificates.certManagement.key=${CAKEY} \
     --set cluster.id="<fill in>"
 
-# Changes between the chart and the original one
+  </details>
 
-### Move secrets into webhook.yml and define certificates:
+## Change the original chart to sap-btp-operator Helm chart
+
+1. Move Secrets into `webhook.yml` and define certificates:
 ```yaml
 {{- $cn := printf "sap-btp-operator-webhook-service"  }}
 {{- $ca := genCA (printf "%s-%s" $cn "ca") 3650 }}
@@ -106,7 +124,7 @@ data:
 ---
 {{- end}}
 ```
-Add `caBundle` definition in both webhooks:
+2. Add the `caBundle` definition in both webhooks:
 ```
 {{- if not .Values.manager.certificates }}
 caBundle: {{ b64enc $ca.Cert }}
@@ -114,6 +132,7 @@ caBundle: {{ b64enc $ca.Cert }}
 ```
 
 ### Overrides
+While rendering Kubernetes resource files by Helm, the following values overrides are applied.
 
 ```yaml
 manager:
@@ -128,26 +147,26 @@ manager:
     enabled: true
 ```
 
-# How to publish a new version of a chart
-## Download the original chart from helm repository
-Configure helm repository:
-```
-helm repo add sap-btp-operator https://sap.github.io/sap-btp-service-operator
-```
-Pull the chart
-```
-helm pull sap-btp-operator/sap-btp-operator
-```
-Yopu can specify the version if needed:
-```
-helm pull sap-btp-operator/sap-btp-operator --version v0.2.0
-```
+## Publish new version of the chart
+1. Download the original chart from Helm repository.  
+   i. Configure the Helm repository
+   ```
+    helm repo add sap-btp-operator https://sap.github.io/sap-btp-service-operator
+   ```
+   ii. Pull the chart
+    ```
+    helm pull sap-btp-operator/sap-btp-operator
+    ```
+   iii. Specify the version if needed
+    ```
+    helm pull sap-btp-operator/sap-btp-operator --version v0.2.0
+    ```
 
-Unpack the downloaded tar and apply necessary changes.
+   iv. Unpack the downloaded tar and apply necessary changes.
 
-## Create a package
-```
-helm package chart 
-```
-## Github release
-Creawte a github release and upload the generated helm chart (tgz).
+2. Create a package.
+    ```
+    helm package chart 
+    ```
+3.  Release the chart on GitHub.  
+Create a GitHub release and upload the generated Helm chart (tgz).
