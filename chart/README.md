@@ -157,12 +157,12 @@ manager:
     ```
     helm pull sap-btp-operator/sap-btp-operator
     ```
-   iii. Specify the version if needed
-    ```
-    helm pull sap-btp-operator/sap-btp-operator --version v0.2.0
-    ```
+   > **NOTE:** You can specify the version if needed
+    >```
+    >helm pull sap-btp-operator/sap-btp-operator --version v0.2.0
+    >```
 
-   iv. Unpack the downloaded tar and apply necessary changes.
+   iii. Unpack the downloaded tar and apply necessary changes.
 
 2. Create a package.
     ```
