@@ -132,7 +132,7 @@ caBundle: {{ b64enc $ca.Cert }}
 ```
 
 ### Overrides
-While rendering Kubernetes resource files by Helm, the following values overrides are applied.
+While rendering Kubernetes resource files by Helm, the following values overrides are applied:
 
 ```yaml
 manager:
@@ -157,14 +157,14 @@ manager:
     ```
     helm pull sap-btp-operator/sap-btp-operator
     ```
-   > **NOTE:** You can specify the version if needed
+   > **NOTE:** You can specify the version if needed.
     >```
     >helm pull sap-btp-operator/sap-btp-operator --version v0.2.0
     >```
 
    iii. Unpack the downloaded tar and apply necessary changes.
 
-2. Create a package.
+2. Create a package
     ```
     helm package chart 
     ```
