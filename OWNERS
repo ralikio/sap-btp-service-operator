@@ -5,8 +5,9 @@ filters:
       - piotrmiskiewicz
       - szwedm
       - ralikio
-      - hanngos
-      - tillknuesting
+      - ukff
+      - MarekMichali
+      - jaroslaw-pieszka
       - PK85
     labels:
       - area/service-management
