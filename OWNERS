@@ -1,7 +1,6 @@
 filters:
   '.*':
     approvers:
-      - wozniakjan
       - piotrmiskiewicz
       - szwedm
       - ralikio
