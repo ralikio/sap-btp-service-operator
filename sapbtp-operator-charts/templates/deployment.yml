@@ -12,6 +12,10 @@ spec:
   selector:
     matchLabels:
       control-plane: controller-manager
+      {{- if eq .Values.manager.kubernetesMatchLabels.enabled true }}
+      app.kubernetes.io/instance: sap-btp-operator
+      app.kubernetes.io/name: sap-btp-operator
+      {{- end }}
   template:
     metadata:
       annotations:
@@ -20,23 +24,49 @@ spec:
         {{- $secretTls := (include (print $.Template.BasePath "/secret-tls.yml") .) -}}
         {{- $configSha := (print $configmap $secret $secretTls) | sha256sum }}
         checksum/config: {{ $configSha }}
+        {{- if .Values.manager.annotations }}
+        {{- toYaml .Values.manager.annotations | nindent 8 }}
+        {{- end }}
       labels:
         control-plane: controller-manager
         app.kubernetes.io/instance: sap-btp-operator
         app.kubernetes.io/name: sap-btp-operator
     spec:
+      serviceAccountName: sap-btp-operator
       containers:
         - args:
             - --secure-listen-address=0.0.0.0:8443
             - --upstream=http://127.0.0.1:8080/
             - --logtostderr=true
             - --v=10
-          image: quay.io/brancz/kube-rbac-proxy:v0.11.0
+
+          {{- if and ( .Values.manager.rbacProxy.image.sha ) ( .Values.manager.rbacProxy.image.tag ) }}
+          image: "{{.Values.manager.rbacProxy.image.repository}}:{{.Values.manager.rbacProxy.image.tag}}@sha256:{{.Values.manager.rbacProxy.image.sha}}"
+          {{- else if .Values.manager.rbacProxy.image.sha }}
+          image: "{{.Values.manager.rbacProxy.image.repository}}@sha256:{{.Values.manager.rbacProxy.image.sha}}"
+          {{- else }}
+          image: "{{.Values.manager.rbacProxy.image.repository}}:{{.Values.manager.rbacProxy.image.tag}}"
+          {{- end }}
           {{- if .Values.manager.securityContext }}
           securityContext:
-          {{ toYaml .Values.manager.securityContext | indent 2 }}
+          {{- toYaml .Values.manager.securityContext | nindent 12 }}
           {{- end }}
           name: kube-rbac-proxy
+          resources:
+            limits:
+              {{- if .Values.manager.rbacProxy.cpu_limit }}
+              cpu: {{ .Values.manager.rbacProxy.cpu_limit }}
+              {{- end }}
+              {{- if .Values.manager.rbacProxy.memory_limit }}
+              memory: {{ .Values.manager.rbacProxy.memory_limit }}
+              {{- end }}
+            requests:
+              {{- if .Values.manager.rbacProxy.req_cpu_limit }}
+              cpu: {{.Values.manager.rbacProxy.req_cpu_limit}}
+              {{- end }}
+              {{- if .Values.manager.rbacProxy.req_memory_limit }}
+              memory: {{.Values.manager.rbacProxy.req_memory_limit}}
+              {{- end }}
           ports:
             - containerPort: 8443
               name: https
@@ -50,11 +80,17 @@ spec:
           envFrom:
             - configMapRef:
                 name: sap-btp-operator-config
-          image: {{.Values.manager.image.repository}}:{{.Values.manager.image.tag}}
+          {{- if and ( .Values.manager.image.sha ) ( .Values.manager.image.tag ) }}
+          image: "{{.Values.manager.image.repository}}:{{.Values.manager.image.tag}}@sha256:{{.Values.manager.image.sha}}"
+          {{- else if .Values.manager.image.sha}}
+          image: "{{.Values.manager.image.repository}}@sha256:{{.Values.manager.image.sha}}"
+          {{- else }}
+          image: "{{.Values.manager.image.repository}}:{{.Values.manager.image.tag}}"
+          {{- end }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.manager.securityContext }}
           securityContext:
-          {{ toYaml .Values.manager.securityContext | indent 2 }}
+          {{- toYaml .Values.manager.securityContext | nindent 12 }}
           {{- end }}
           name: manager
           ports:
@@ -84,9 +120,21 @@ spec:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
               readOnly: true
+    {{- if .Values.manager.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.manager.imagePullSecrets | nindent 8 }}
+    {{- end }}
       terminationGracePeriodSeconds: 10
+      {{- if .Values.manager.priorityClassName }}
+      priorityClassName: {{ .Values.manager.priorityClassName }}
+      {{- end }}
       volumes:
         - name: cert
           secret:
             defaultMode: 420
             secretName: webhook-server-cert
+      {{- if .Values.manager.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.deployment.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.manager.tolerations }}
+      tolerations: {{ toYaml .Values.deployment.tolerations | nindent 8 }}
+      {{- end }}

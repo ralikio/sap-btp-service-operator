@@ -4,7 +4,7 @@
 
 manager:
   memory_limit: 200Mi
-  cpu_limit: 250m  
+  cpu_limit: 250m
   req_memory_limit: 20Mi
   req_cpu_limit: 100m
   allow_cluster_access: true
@@ -15,6 +15,7 @@ manager:
   image:
     repository: ghcr.io/sap/sap-btp-service-operator/controller
     tag: master
+    sha: ""
   secret:
     b64encoded: false
     enabled: true
@@ -26,6 +27,28 @@ manager:
     sm_url: ""
     tokenurl: ""
     tokenurlsuffix: "/oauth/token"
+  rbacProxy:
+    image:
+      repository: quay.io/brancz/kube-rbac-proxy
+      sha: ""
+      tag: v0.11.0
+    memory_limit: ""
+    cpu_limit: ""
+    req_memory_limit: ""
+    req_cpu_limit: ""
+  imagePullSecrets: []
+  #   - name: registrySecretName
+  pullSecretTemplate:
+  # creates a secret to be used in imagePullSecrets from a template
+  # output of data will be in form {"auths":{"myhost":{"auth":<encoded username:password>},"myhost1":{"auth":<encoded username:password>}}}
+  #    name: registrySecretName
+  #    authentication:
+  #      - password: mypwd
+  #        username: myuser
+  #        host: myhost
+  #      - password: mypwd1
+  #        username: myuser1
+  #        host: myhost1
   certificates:
     # Configure if https://github.com/jetstack/cert-manager is used
     certManager: true
@@ -59,6 +82,8 @@ manager:
   #   runAsNonRoot: true
   securityContext: {}
   health_service:
+    enabled: false
+  kubernetesMatchLabels:
     enabled: false
 cluster:
   id:

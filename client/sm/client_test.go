@@ -3,7 +3,6 @@ package sm
 import (
 	"context"
 	"encoding/json"
-	"github.com/Peripli/service-manager/pkg/web"
 	"github.com/SAP/sap-btp-service-operator/client/sm/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,7 +33,7 @@ var _ = Describe("Client test", func() {
 			responseBody, _ := json.Marshal(instances)
 
 			handlerDetails = []HandlerDetails{
-				{Method: http.MethodGet, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+				{Method: http.MethodGet, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 			}
 		})
 
@@ -55,7 +54,7 @@ var _ = Describe("Client test", func() {
 					responseBody, _ := json.Marshal(instances)
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should return an empty array", func() {
@@ -68,7 +67,7 @@ var _ = Describe("Client test", func() {
 			Context("When invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle status code != 200", func() {
@@ -81,7 +80,7 @@ var _ = Describe("Client test", func() {
 			Context("When invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL, ResponseStatusCode: http.StatusBadRequest},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL, ResponseStatusCode: http.StatusBadRequest},
 					}
 				})
 				It("should handle status code > 299", func() {
@@ -97,7 +96,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					responseBody, _ := json.Marshal(instance)
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should return it", func() {
@@ -110,7 +109,7 @@ var _ = Describe("Client test", func() {
 			Context("When there is no instance with this id", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusNotFound},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusNotFound},
 					}
 				})
 				It("should return 404", func() {
@@ -123,7 +122,7 @@ var _ = Describe("Client test", func() {
 			Context("When invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle status code != 200", func() {
@@ -136,7 +135,7 @@ var _ = Describe("Client test", func() {
 			Context("When invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusBadRequest},
+						{Method: http.MethodGet, Path: types.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusBadRequest},
 					}
 				})
 
@@ -172,15 +171,15 @@ var _ = Describe("Client test", func() {
 				offerings := types.ServiceOfferings{ServiceOfferings: offeringArray}
 				offeringResponseBody, _ := json.Marshal(offerings)
 				handlerDetails = []HandlerDetails{
-					{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseBody: instanceResponseBody, ResponseStatusCode: http.StatusCreated},
-					{Method: http.MethodGet, Path: web.ServiceOfferingsURL, ResponseBody: offeringResponseBody, ResponseStatusCode: http.StatusOK},
-					{Method: http.MethodGet, Path: web.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK},
+					{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseBody: instanceResponseBody, ResponseStatusCode: http.StatusCreated},
+					{Method: http.MethodGet, Path: types.ServiceOfferingsURL, ResponseBody: offeringResponseBody, ResponseStatusCode: http.StatusOK},
+					{Method: http.MethodGet, Path: types.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK},
 				}
 			})
 
 			Context("When valid instance is being provisioned synchronously", func() {
 				It("should provision successfully", func() {
-					res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+					res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(res.Location).Should(HaveLen(0))
@@ -205,11 +204,11 @@ var _ = Describe("Client test", func() {
 						plansArray := []types.ServicePlan{*plan1, *plan2}
 						plans := types.ServicePlans{ServicePlans: plansArray}
 						plansBody, _ := json.Marshal(plans)
-						handlerDetails[2] = HandlerDetails{Method: http.MethodGet, Path: web.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK}
+						handlerDetails[2] = HandlerDetails{Method: http.MethodGet, Path: types.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK}
 					})
 
 					It("should provision successfully", func() {
-						res, err := client.Provision(instance, "mongo", "small", params, "test-user")
+						res, err := client.Provision(instance, "mongo", "small", params, "test-user", "")
 						Expect(err).ShouldNot(HaveOccurred())
 						Expect(res.Location).Should(HaveLen(0))
 						Expect(res.InstanceID).To(Equal(instance.ID))
@@ -219,7 +218,7 @@ var _ = Describe("Client test", func() {
 				Context("When no plan id provided", func() {
 					It("should provision successfully", func() {
 						instance.ServicePlanID = ""
-						res, err := client.Provision(instance, "mongo", "small", params, "test-user")
+						res, err := client.Provision(instance, "mongo", "small", params, "test-user", "")
 						Expect(err).ShouldNot(HaveOccurred())
 						Expect(res.Location).Should(HaveLen(0))
 						Expect(res.InstanceID).To(Equal(instance.ID))
@@ -230,7 +229,7 @@ var _ = Describe("Client test", func() {
 			Context("When invalid instance is being provisioned synchronously", func() {
 				When("No service name", func() {
 					It("should fail to provision", func() {
-						res, err := client.Provision(instance, "", "small", params, "test-user")
+						res, err := client.Provision(instance, "", "small", params, "test-user", "")
 						Expect(err).Should(HaveOccurred())
 						Expect(res).To(BeNil())
 					})
@@ -238,7 +237,7 @@ var _ = Describe("Client test", func() {
 
 				When("No plan name", func() {
 					It("should fail to provision", func() {
-						res, err := client.Provision(instance, "mongo", "", params, "test-user")
+						res, err := client.Provision(instance, "mongo", "", params, "test-user", "")
 						Expect(err).Should(HaveOccurred())
 						Expect(res).To(BeNil())
 					})
@@ -247,7 +246,7 @@ var _ = Describe("Client test", func() {
 				When("Plan id not match plan name", func() {
 					It("should fail", func() {
 						instance.ServicePlanID = "some-id"
-						res, err := client.Provision(instance, "mongo", "small", params, "test-user")
+						res, err := client.Provision(instance, "mongo", "small", params, "test-user", "")
 						Expect(err).Should(HaveOccurred())
 						Expect(res).To(BeNil())
 					})
@@ -258,10 +257,10 @@ var _ = Describe("Client test", func() {
 						var offeringsArray []types.ServiceOffering
 						offerings := types.ServiceOfferings{ServiceOfferings: offeringsArray}
 						responseBody, _ := json.Marshal(offerings)
-						handlerDetails[1] = HandlerDetails{Method: http.MethodGet, Path: web.ServiceOfferingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK}
+						handlerDetails[1] = HandlerDetails{Method: http.MethodGet, Path: types.ServiceOfferingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK}
 					})
 					It("should fail", func() {
-						res, err := client.Provision(instance, "mongo2", "small", params, "test-user")
+						res, err := client.Provision(instance, "mongo2", "small", params, "test-user", "")
 						Expect(err).Should(HaveOccurred())
 						Expect(res).To(BeNil())
 					})
@@ -272,10 +271,10 @@ var _ = Describe("Client test", func() {
 				var locationHeader string
 				BeforeEach(func() {
 					locationHeader = "/v1/service_instances/12345/operations/1234"
-					handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}}
+					handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}}
 				})
 				It("should receive operation location", func() {
-					res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+					res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(res.Location).Should(Equal(locationHeader))
@@ -290,11 +289,11 @@ var _ = Describe("Client test", func() {
 					}{
 						Name: true,
 					})
-					handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated}
+					handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated}
 
 				})
 				It("should return error", func() {
-					res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+					res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).Should(HaveOccurred())
 					Expect(res).To(BeNil())
@@ -305,10 +304,10 @@ var _ = Describe("Client test", func() {
 				Context("And status code is unsuccessful", func() {
 					BeforeEach(func() {
 						responseBody, _ := json.Marshal(instance)
-						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK}
+						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK}
 					})
 					It("should return error with status code", func() {
-						res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+						res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						verifyErrorMsg(err.Error(), handlerDetails[0].Path, handlerDetails[0].ResponseBody, handlerDetails[0].ResponseStatusCode)
@@ -319,11 +318,11 @@ var _ = Describe("Client test", func() {
 				Context("And status code is unsuccessful", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": "description", "error": "error"}`)
-						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest}
+						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest}
 
 					})
 					It("should return error with url and description", func() {
-						res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+						res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						verifyErrorMsg(err.Error(), handlerDetails[0].Path, handlerDetails[0].ResponseBody, handlerDetails[0].ResponseStatusCode)
@@ -334,11 +333,11 @@ var _ = Describe("Client test", func() {
 				Context("And invalid response body", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": description", "error": "error"}`)
-						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: web.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest}
+						handlerDetails[0] = HandlerDetails{Method: http.MethodPost, Path: types.ServiceInstancesURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest}
 
 					})
 					It("should return error without url and description if invalid response body", func() {
-						res, err := client.Provision(instance, serviceName, planName, params, "test-user")
+						res, err := client.Provision(instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						verifyErrorMsg(err.Error(), handlerDetails[0].Path, handlerDetails[0].ResponseBody, handlerDetails[0].ResponseStatusCode)
@@ -355,7 +354,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					responseBody := []byte("{}")
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodDelete, Path: types.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should be successfully removed", func() {
@@ -370,7 +369,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					locationHeader = "location"
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
+						{Method: http.MethodDelete, Path: types.ServiceInstancesURL + "/", ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
 					}
 				})
 				It("should be successfully removed", func() {
@@ -385,7 +384,7 @@ var _ = Describe("Client test", func() {
 					responseBody := []byte("{}")
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodDelete, Path: types.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle error", func() {
@@ -401,7 +400,7 @@ var _ = Describe("Client test", func() {
 					responseBody := []byte(`{ "description": "Instance not found" }`)
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusNotFound},
+						{Method: http.MethodDelete, Path: types.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusNotFound},
 					}
 				})
 				It("should be considered as success", func() {
@@ -433,18 +432,18 @@ var _ = Describe("Client test", func() {
 				offerings := types.ServiceOfferings{ServiceOfferings: offeringArray}
 				offeringResponseBody, _ := json.Marshal(offerings)
 				handlerDetails = []HandlerDetails{
-					{Method: http.MethodGet, Path: web.ServiceOfferingsURL, ResponseBody: offeringResponseBody, ResponseStatusCode: http.StatusOK},
-					{Method: http.MethodGet, Path: web.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK},
+					{Method: http.MethodGet, Path: types.ServiceOfferingsURL, ResponseBody: offeringResponseBody, ResponseStatusCode: http.StatusOK},
+					{Method: http.MethodGet, Path: types.ServicePlansURL, ResponseBody: plansBody, ResponseStatusCode: http.StatusOK},
 				}
 			})
 			Context("When valid instance is being updated synchronously", func() {
 				BeforeEach(func() {
 					responseBody, _ := json.Marshal(instance)
 					handlerDetails = append(handlerDetails,
-						HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK})
+						HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK})
 				})
 				It("should update successfully", func() {
-					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(location).Should(HaveLen(0))
@@ -457,10 +456,10 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					locationHeader = "test-location"
 					handlerDetails = append(handlerDetails,
-						HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}})
+						HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}})
 				})
 				It("should receive operation location", func() {
-					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(location).Should(Equal(locationHeader))
@@ -476,10 +475,10 @@ var _ = Describe("Client test", func() {
 						Name: true,
 					})
 					handlerDetails = append(handlerDetails,
-						HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK})
+						HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK})
 				})
 				It("should return error", func() {
-					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+					responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).Should(HaveOccurred())
 					Expect(location).Should(BeEmpty())
@@ -492,10 +491,10 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody, _ := json.Marshal(instance)
 						handlerDetails = append(handlerDetails,
-							HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusTeapot})
+							HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusTeapot})
 					})
 					It("should return error with status code", func() {
-						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						Expect(location).Should(BeEmpty())
@@ -508,10 +507,10 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": "description", "error": "error"}`)
 						handlerDetails = append(handlerDetails,
-							HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest})
+							HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest})
 					})
 					It("should return error with url and description", func() {
-						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						Expect(location).Should(BeEmpty())
@@ -524,10 +523,10 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": description", "error": "error"}`)
 						handlerDetails = append(handlerDetails,
-							HandlerDetails{Method: http.MethodPatch, Path: web.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest})
+							HandlerDetails{Method: http.MethodPatch, Path: types.ServiceInstancesURL + "/" + instance.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest})
 					})
 					It("should return error without url and description if invalid response body", func() {
-						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+						responseInstance, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 						Expect(err).Should(HaveOccurred())
 						Expect(location).Should(BeEmpty())
@@ -544,7 +543,7 @@ var _ = Describe("Client test", func() {
 					var err error
 					client, err = NewClient(context.TODO(), &ClientConfig{URL: "invalidURL"}, fakeAuthClient)
 					Expect(err).ToNot(HaveOccurred())
-					_, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user")
+					_, location, err := client.UpdateInstance(instance.ID, instance, serviceName, planName, params, "test-user", "")
 
 					Expect(err).Should(HaveOccurred())
 					Expect(location).Should(BeEmpty())
@@ -583,7 +582,7 @@ var _ = Describe("Client test", func() {
 					responseBody, _ := json.Marshal(bindings)
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should return all", func() {
@@ -601,7 +600,7 @@ var _ = Describe("Client test", func() {
 					responseBody, _ := json.Marshal(bindings)
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should return an empty array", func() {
@@ -614,7 +613,7 @@ var _ = Describe("Client test", func() {
 			Context("when invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle status code != 200", func() {
@@ -627,7 +626,7 @@ var _ = Describe("Client test", func() {
 			Context("when invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL, ResponseStatusCode: http.StatusBadRequest},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL, ResponseStatusCode: http.StatusBadRequest},
 					}
 				})
 				It("should handle status code > 299", func() {
@@ -643,7 +642,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					responseBody, _ := json.Marshal(binding)
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should return it", func() {
@@ -656,7 +655,7 @@ var _ = Describe("Client test", func() {
 			Context("when there is no binding with this id", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusNotFound},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusNotFound},
 					}
 				})
 				It("should return 404", func() {
@@ -669,7 +668,7 @@ var _ = Describe("Client test", func() {
 			Context("when invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle status code != 200", func() {
@@ -682,7 +681,7 @@ var _ = Describe("Client test", func() {
 			Context("when invalid status code is returned", func() {
 				BeforeEach(func() {
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodGet, Path: web.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusBadRequest},
+						{Method: http.MethodGet, Path: types.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusBadRequest},
 					}
 				})
 				It("should handle status code > 299", func() {
@@ -699,7 +698,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					responseBody, _ := json.Marshal(binding)
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should provision successfully", func() {
@@ -716,7 +715,7 @@ var _ = Describe("Client test", func() {
 				BeforeEach(func() {
 					locationHeader = "test-location"
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
+						{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
 					}
 				})
 				It("should receive operation location", func() {
@@ -736,7 +735,7 @@ var _ = Describe("Client test", func() {
 						Name: true,
 					})
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should return error", func() {
@@ -753,7 +752,7 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody, _ := json.Marshal(binding)
 						handlerDetails = []HandlerDetails{
-							{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+							{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 						}
 					})
 					It("should return error with status code", func() {
@@ -770,7 +769,7 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": "description", "error": "error"}`)
 						handlerDetails = []HandlerDetails{
-							{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest},
+							{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest},
 						}
 					})
 					It("should return error with url and description", func() {
@@ -787,7 +786,7 @@ var _ = Describe("Client test", func() {
 					BeforeEach(func() {
 						responseBody := []byte(`{ "description": description", "error": "error"}`)
 						handlerDetails = []HandlerDetails{
-							{Method: http.MethodPost, Path: web.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest},
+							{Method: http.MethodPost, Path: types.ServiceBindingsURL, ResponseBody: responseBody, ResponseStatusCode: http.StatusBadRequest},
 						}
 					})
 					It("should return error without url and description if invalid response body", func() {
@@ -905,7 +904,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 				BeforeEach(func() {
 					responseBody := []byte("{}")
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+						{Method: http.MethodDelete, Path: types.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 					}
 				})
 				It("should be successfully removed", func() {
@@ -920,7 +919,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 				BeforeEach(func() {
 					locationHeader = "location"
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
+						{Method: http.MethodDelete, Path: types.ServiceBindingsURL + "/", ResponseStatusCode: http.StatusAccepted, Headers: map[string]string{"Location": locationHeader}},
 					}
 				})
 				It("should be successfully removed", func() {
@@ -935,7 +934,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 					responseBody := []byte("{}")
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
+						{Method: http.MethodDelete, Path: types.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusCreated},
 					}
 				})
 				It("should handle error", func() {
@@ -951,7 +950,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 					responseBody := []byte(`{ "description": "Binding not found" }`)
 
 					handlerDetails = []HandlerDetails{
-						{Method: http.MethodDelete, Path: web.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusNotFound},
+						{Method: http.MethodDelete, Path: types.ServiceBindingsURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusNotFound},
 					}
 				})
 				It("should be considered as success", func() {
@@ -966,7 +965,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 			BeforeEach(func() {
 				responseBody, _ := json.Marshal(binding)
 				handlerDetails = []HandlerDetails{
-					{Method: http.MethodPatch, Path: web.ServiceBindingsURL + "/" + binding.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+					{Method: http.MethodPatch, Path: types.ServiceBindingsURL + "/" + binding.ID, ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 				}
 			})
 
@@ -979,7 +978,7 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 	})
 
 	It("build operation url", func() {
-		opUrl := BuildOperationURL("5678", "1234", web.ServiceInstancesURL)
+		opUrl := BuildOperationURL("5678", "1234", types.ServiceInstancesURL)
 		Expect(opUrl).To(Equal("/v1/service_instances/1234/operations/5678"))
 	})
 
@@ -994,12 +993,12 @@ TSTAhYWEQVZqRKYQMYGHpNlU
 			}
 			responseBody, _ := json.Marshal(operation)
 			handlerDetails = []HandlerDetails{
-				{Method: http.MethodGet, Path: web.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
+				{Method: http.MethodGet, Path: types.ServiceInstancesURL + "/", ResponseBody: responseBody, ResponseStatusCode: http.StatusOK},
 			}
 		})
 
 		It("should return it", func() {
-			result, err := client.Status(web.ServiceInstancesURL+"/1234/"+operation.ID, params)
+			result, err := client.Status(types.ServiceInstancesURL+"/1234/"+operation.ID, params)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(result).To(Equal(operation))
 		})
