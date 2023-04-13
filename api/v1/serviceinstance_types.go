@@ -17,8 +17,8 @@ limitations under the License.
 package v1
 
 import (
-	"github.com/Peripli/service-manager/pkg/types"
 	"github.com/SAP/sap-btp-service-operator/api"
+	"github.com/SAP/sap-btp-service-operator/client/sm/types"
 	v1 "k8s.io/api/authentication/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,6 +39,10 @@ type ServiceInstanceSpec struct {
 	// The name of the service plan
 	// +kubebuilder:validation:MinLength=1
 	ServicePlanName string `json:"servicePlanName"`
+
+	// The dataCenter in case service offering and plan name exist in other data center and not on main
+	// +optional
+	DataCenter string `json:"dataCenter,omitempty"`
 
 	// The plan ID in case service offering and plan name are ambiguous
 	// +optional
@@ -108,6 +112,7 @@ type ServiceInstanceStatus struct {
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:JSONPath=".spec.serviceOfferingName",name="Offering",type=string
 // +kubebuilder:printcolumn:JSONPath=".spec.servicePlanName",name="Plan",type=string
+// +kubebuilder:printcolumn:JSONPath=".spec.dataCenter",name="dataCenter",type=string
 // +kubebuilder:printcolumn:JSONPath=".status.conditions[0].reason",name="Status",type=string
 // +kubebuilder:printcolumn:JSONPath=".status.ready",name="Ready",type=string
 // +kubebuilder:printcolumn:JSONPath=".metadata.creationTimestamp",name="Age",type=date
