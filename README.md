@@ -108,7 +108,7 @@ It is implemented using a [CRDs-based](https://kubernetes.io/docs/concepts/exten
     ```bash
     helm upgrade --install <release-name> sap-btp-operator/sap-btp-operator \
         --create-namespace \
-        --namespace=sap-btp-operator \        
+        --namespace=sap-btp-operator \
         --set manager.secret.clientid=<clientid> \
         --set manager.secret.clientsecret=<clientsecret> \
         --set manager.secret.sm_url=<sm_url> \

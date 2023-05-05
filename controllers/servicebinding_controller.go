@@ -19,8 +19,9 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
+
+	"fmt"
 
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -956,7 +957,6 @@ func (r *ServiceBindingReconciler) handleStaleServiceBinding(ctx context.Context
 		meta.SetStatusCondition(&serviceBinding.Status.Conditions, pendingTerminationCondition)
 		return ctrl.Result{}, r.updateStatus(ctx, serviceBinding)
 	}
-
 	return ctrl.Result{}, nil
 }
 
