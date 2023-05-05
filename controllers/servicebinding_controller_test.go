@@ -1186,3 +1186,4 @@ func getSecret(ctx context.Context, name, namespace string, failOnError bool) *c
 	}
 	return secret
 }
+
