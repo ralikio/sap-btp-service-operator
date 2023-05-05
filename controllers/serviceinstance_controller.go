@@ -408,38 +408,6 @@ func (r *ServiceInstanceReconciler) resyncInstanceStatus(ctx context.Context, sm
 	}
 }
 
-func getOfferingTags(smClient sm.Client, planID string) ([]string, error) {
-	planQuery := &sm.Parameters{
-		FieldQuery: []string{fmt.Sprintf("id eq '%s'", planID)},
-	}
-	plans, err := smClient.ListPlans(planQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	if plans == nil || len(plans.ServicePlans) != 1 {
-		return nil, fmt.Errorf("could not find plan with id %s", planID)
-	}
-
-	offeringQuery := &sm.Parameters{
-		FieldQuery: []string{fmt.Sprintf("id eq '%s'", plans.ServicePlans[0].ServiceOfferingID)},
-	}
-
-	offerings, err := smClient.ListOfferings(offeringQuery)
-	if err != nil {
-		return nil, err
-	}
-	if offerings == nil || len(offerings.ServiceOfferings) != 1 {
-		return nil, fmt.Errorf("could not find offering with id %s", plans.ServicePlans[0].ServiceOfferingID)
-	}
-
-	var tags []string
-	if err := json.Unmarshal(offerings.ServiceOfferings[0].Tags, &tags); err != nil {
-		return nil, err
-	}
-	return tags, nil
-}
-
 func (r *ServiceInstanceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&servicesv1.ServiceInstance{}).
